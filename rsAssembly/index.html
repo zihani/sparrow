@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust WebAssembly 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Rust WebAssembly 演示</h1>
+        
+        <div class="demo-section">
+            <h3>加法计算</h3>
+            <button onclick="testAdd()">测试加法 (5 + 7)</button>
+            <div id="addResult" class="result"></div>
+        </div>
+
+        <div class="demo-section">
+            <h3>问候功能</h3>
+            <input type="text" id="nameInput" placeholder="输入你的名字">
+            <button onclick="testGreet()">发送问候</button>
+            <div id="greetResult" class="result"></div>
+        </div>
+
+        <div class="demo-section">
+            <h3>斐波那契数列</h3>
+            <input type="number" id="fibInput" value="10" min="1" max="20">
+            <button onclick="testFibonacci()">计算斐波那契数</button>
+            <div id="fibResult" class="result"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { add, greet, fibonacci } from './pkg/hello_wasm.js';
+
+        async function run() {
+            await init();
+            console.log('WebAssembly 模块初始化完成');
+        }
+
+        run();
+
+        window.testAdd = async function() {
+            await init();
+            const result = add(5, 7);
+            document.getElementById('addResult').textContent = `5 + 7 = ${result}`;
+        };
+
+        window.testGreet = async function() {
+            await init();
+            const name = document.getElementById('nameInput').value || '开发者';
+            const message = greet(name);
+            document.getElementById('greetResult').textContent = message;
+        };
+
+        window.testFibonacci = async function() {
+            await init();
+            const n = parseInt(document.getElementById('fibInput').value);
+            const result = fibonacci(n);
+            document.getElementById('fibResult').textContent = `斐波那契数列第 ${n} 项: ${result}`;
+        };
+    </script>
+</body>
+</html>
