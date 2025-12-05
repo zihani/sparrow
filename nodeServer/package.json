@@ -1,0 +1,31 @@
+{
+  "name": "node-server",
+  "version": "1.0.0",
+  "description": "koa.js server",
+  "main": "app.ts",
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "ts-node-dev --respawn app.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3",
+    "koa": "^3.1.1",
+    "koa-bodyparser": "^4.4.1",
+    "koa-jwt": "^4.0.4",
+    "koa-router": "^14.0.0",
+    "koa-swagger-decorator": "^1.8.7"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/koa": "^3.0.1",
+    "@types/koa-bodyparser": "^4.3.13",
+    "@types/koa-jwt": "^3.2.2",
+    "@types/koa-router": "^7.4.9",
+    "@types/node": "^24.10.1",
+    "@types/swagger-ui-dist": "^3.30.6",
+    "nodemon": "^3.1.11",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
