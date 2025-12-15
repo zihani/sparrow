@@ -71,27 +71,12 @@ import BodyEditor from '../apiPost/BodyEditor.vue';
 import ResponseDisplay from '../apiPost/ResponseDisplay.vue';
 import ResponseHeadersDisplay from '../apiPost/ResponseHeadersDisplay.vue';
 import KeyValueTable from '../apiPost/KeyValueTable.vue';
-
+import type { RequestConfig, ApiResponse } from '../../interface/interface-apiPost';
+import type from 'typescript';
 // --- 类型定义 ---
 
 // 定义支持的 HTTP 方法
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'CONNECT';
-
-// 请求配置的结构
-interface RequestConfig {
-  params: { key: string, value: string }[];
-  authorization: { type: 'None' | 'Bearer Token', token: string };
-  headers: { key: string, value: string }[];
-  body: { type: 'none' | 'raw' | 'form-data', content: string };
-}
-
-// 响应结果的结构 (简化)
-interface ApiResponse {
-  status: number;
-  time: number; // ms
-  headers: Record<string, string>;
-  data: any;
-}
 
 
 // --- 核心逻辑 ---
