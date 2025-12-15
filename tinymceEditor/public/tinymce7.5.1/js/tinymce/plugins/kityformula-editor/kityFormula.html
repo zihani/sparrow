@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" href="kityformula/assets/styles/base.css">
+    <link rel="stylesheet" href="kityformula/assets/styles/ui.css">
+    <link rel="stylesheet" href="kityformula/assets/styles/scrollbar.css">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+        }
+        .kf-editor {
+            width: 780px;
+            height: 380px;
+        }
+        #loading {
+            height: 32px;
+            width: 340px;
+            line-height: 32px;
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            margin-left: -170px;
+            font-family: arial, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+        }
+        #loading img {
+            position: absolute;
+        }
+        #loading p {
+            display: block;
+            position: absolute;
+            left: 40px;
+            top: 0px;
+            margin: 0;
+        }
+
+    </style>
+    <title></title>
+</head>
+<body>
+    <label for="fontSelect">选择字体:</label>
+    <select id="fontSelect">
+        <option value="Arial">Arial</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Verdana">Verdana</option>
+        <!-- 可以添加更多字体选项 -->
+    </select> 
+    颜色： <input class="color" type="color" > 
+    <label for="sizeSelect">字号大小:</label>
+    <select id="sizeSelect">
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+        <option value="30px">30px</option>
+        <option value="40px">40px</option>
+        <option value="50px">50px</option>
+        <option value="60px">60px</option>
+        <option value="70px">70px</option>
+    </select>
+    <div id="kfEditorContainer" class="kf-editor">
+        <div id="tips" class="tips">
+            sorry! Beta版本仅支持IE9及以上版本的浏览器，正式版本将会支持低版本浏览器，谢谢您的关注！
+        </div>
+    </div>
+ 
+<script src="kityformula/js/jquery-3.6.0.min.js"></script>
+<script src="kityformula/js/kitygraph.all.js"></script>
+<script src="kityformula/js/kity-formula-render.all.js"></script>
+<script src="kityformula/js/kity-formula-parser.all.min.js"></script>
+<script src="kityformula/js/kityformula-editor.all.min.js"></script>
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+// 字体
+var font
+// 颜色
+var color
+// 字号大小
+var size
+var i = 0
+// 处理属性
+function getDomsetAttribute() {
+    let canvas = document.querySelector('.kf-editor-canvas-container')
+    if(canvas.querySelectorAll('text')){
+        for (const element of canvas.querySelectorAll('text')) {
+            if(color){
+                element.setAttribute('fill',color)
+            } 
+            if(size){
+                element.setAttribute('font-size', size)  
+            }
+            if(font){
+                element.setAttribute('font-family', font)
+            }
+        }
+    }
+}
+let domaddevent = function(){
+    document.querySelectorAll('.kf-editor-ui-area-item').forEach((item) => {
+        item.addEventListener('click', function(e){
+            getDomsetAttribute()
+        })
+    })
+}
+//实例化编辑器
+jQuery( function ($) {
+    if ( document.body.addEventListener ) {
+        $( "#tips").html('<div id="loading"><img src="kityformula/loading.gif" alt="loading" /><p>正在加载，请耐心等待...</p></div>' );
+        var factory = kf.EditorFactory.create( $( "#kfEditorContainer" )[ 0 ], {
+            render: {
+                fontsize: 24
+            },
+            resource: {
+                path: "./kityformula/resource/"
+            }
+        });
+        factory.ready(function( KFEditor ) {
+            $( "#tips").remove();
+            //处理地址栏的参数并加载到编辑器中
+            var lslatex=getQueryVariable("lslatex")
+            var attributes=getQueryVariable("attributes")
+            // console.log(decodeURIComponent(attributes))
+            if(lslatex){
+                let attributesArr = decodeURIComponent(attributes).split(',')
+                for (const element of attributesArr) {
+                    if(element){
+                        let arr = element.split(':')
+                        window[arr[0]] = arr[1]
+                    }
+                }
+                this.execCommand( "render",decodeURIComponent(lslatex) );
+                document.querySelector('.color').value = color
+                document.getElementById('sizeSelect').value = size
+                document.getElementById('fontSelect').value = font
+                getDomsetAttribute()
+                domaddevent()
+            } else {
+                this.execCommand( "render","\\placeholder" );
+                domaddevent()
+            };
+            this.execCommand( "focus" );
+            window.kfe = this;
+        });
+    } else {
+        $( "#tips").css( "color", "black" );
+        $( "#tips").css( "padding", "10px" );
+    }
+} );
+document.querySelector('.color').addEventListener("change",function(e){
+    color = e.target.value;
+    getDomsetAttribute()
+})
+document.getElementById('sizeSelect').addEventListener('change',function(e){
+    size = e.target.value
+    getDomsetAttribute()
+})
+document.getElementById('fontSelect').addEventListener('change',function(e){
+    font = e.target.value
+    getDomsetAttribute()
+})
+//获取url地址栏传参
+function getQueryVariable(variable){
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+    }
+    return(false);
+}
+//处理TinyMCE编辑器的事件
+window.addEventListener('message', function (event) {
+  var data = event.data;
+  kfe.execCommand('get.image.data', function(data){
+        var latex = kfe.execCommand('get.source');
+        window.parent.postMessage({
+            mceAction: 'insertContent',
+            content: `<img data-attributes="${size?'size:' + size:''},${color?'color:' + color:''},${font?'font:' + font:''}" src="${data.img}" data-latex="${latex}">`
+        }, '*');
+        window.parent.postMessage({
+            mceAction: 'close'
+        }, '*');
+  });
+});
+
+</script>
+</body>
+</html>

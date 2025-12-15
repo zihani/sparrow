@@ -1,0 +1,81 @@
+/**
+* Copyright (c) Tiny Technologies, Inc. All rights reserved.
+* Licensed under the LGPL or a commercial license.
+* For LGPL see License.txt in the project root for license information.
+* For commercial licenses see https://www.tiny.cloud/
+*/
+body {
+  font-family: Microsoft YaHei, Helvetica Neue, PingFang SC, sans-serif;
+  line-height: 1.4;
+  font-size: 18px;
+  color: #2c3e50;
+  -webkit-font-smoothing: antialiased;
+}
+p {
+  /* margin: 0 0 10px; */
+  /* display: block; */
+  width: 100%;
+}
+li {
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+table {
+  border-collapse: collapse;
+}
+table td,
+table th {
+  border: 1px solid #ccc;
+  padding: 0.4rem;
+}
+figure {
+  display: table;
+  /*fix qjp*/
+  /*margin: 1rem auto;*/
+}
+figure figcaption {
+  color: #999;
+  display: block;
+  margin-top: 0.25rem;
+  text-align: center;
+  font-size: 14px;
+}
+hr {
+  border-color: #ccc;
+  border-style: solid;
+  border-width: 1px 0 0 0;
+}
+code {
+  background-color: #e8e8e8;
+  border-radius: 3px;
+  padding: 0.1rem 0.2rem;
+}
+.mce-content-body:not([dir="rtl"]) blockquote {
+  border-left: 2px solid #ccc;
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+}
+.mce-content-body[dir="rtl"] blockquote {
+  border-right: 2px solid #ccc;
+  margin-right: 1.5rem;
+  padding-right: 1rem;
+}
+/* qjp 修改*/
+audio {
+  display: block!important;
+  margin-bottom: 10px!important;
+}
+video {
+  width: 100%;
+}
+img {
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+figcaption:empty::before {
+  content: 'Caption';
+  text-align: center;
+}

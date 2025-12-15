@@ -1,0 +1,1 @@
+tinymce.addI18n("zh",{Formula:"公式编辑器",Cancel:"取消","Insert Formula":"确认"});

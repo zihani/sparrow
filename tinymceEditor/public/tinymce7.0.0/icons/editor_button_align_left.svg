@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="20" viewBox="0 0 30 20">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        clip-path: url(#clip-path);
+      }
+
+      .cls-3 {
+        clip-path: url(#clip-path-2);
+      }
+
+      .cls-4 {
+        fill: #666;
+      }
+    </style>
+    <clipPath id="clip-path">
+      <rect id="矩形_1672" data-name="矩形 1672" class="cls-1" width="30" height="20" transform="translate(-240)"/>
+    </clipPath>
+    <clipPath id="clip-path-2">
+      <rect id="矩形_1671" data-name="矩形 1671" class="cls-1" width="20" height="20" transform="translate(-240)"/>
+    </clipPath>
+  </defs>
+  <g id="editor_button_align_left" transform="translate(240)">
+    <g id="组_1798" data-name="组 1798">
+      <g id="组_1797" data-name="组 1797" class="cls-2">
+        <g id="组_1796" data-name="组 1796">
+          <g id="组_1795" data-name="组 1795" class="cls-3">
+            <path id="路径_201" data-name="路径 201" class="cls-4" d="M-223,5h-14a1,1,0,0,1-1-1,1,1,0,0,1,1-1h14a1,1,0,0,1,1,1,1,1,0,0,1-1,1"/>
+            <path id="路径_202" data-name="路径 202" class="cls-4" d="M-231,9h-6a1,1,0,0,1-1-1,1,1,0,0,1,1-1h6a1,1,0,0,1,1,1,1,1,0,0,1-1,1"/>
+            <path id="路径_203" data-name="路径 203" class="cls-4" d="M-231,17h-6a1,1,0,0,1-1-1,1,1,0,0,1,1-1h6a1,1,0,0,1,1,1,1,1,0,0,1-1,1"/>
+            <path id="路径_204" data-name="路径 204" class="cls-4" d="M-223,13h-14a1,1,0,0,1-1-1,1,1,0,0,1,1-1h14a1,1,0,0,1,1,1,1,1,0,0,1-1,1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <path id="多边形_7" data-name="多边形 7" class="cls-4" d="M2.5,0,5,3H0Z" transform="translate(-213 12) rotate(180)"/>
+  </g>
+</svg>
