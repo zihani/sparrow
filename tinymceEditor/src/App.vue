@@ -2,7 +2,7 @@
   <div id="app">
     <section class="layout">
       <div class="header">{{content}}</div>
-      <contents class="leftSide"></contents>
+      <contents class="leftSide" :dataTree="tocTree"></contents>
       <div class="body">
         <tinymce :newTinymceId="newTinymceId" :newTinymceClass="newTinymceClass"  v-model="content" :config="config" :src_path="src_path" :setTimeout_loading_time='1000' @tinymce-paste='paste' @update:modelValue="handleModelUpdate"></tinymce>
       </div>
@@ -30,22 +30,25 @@ export default {
       config: {}, // tinymce配置
       content:'<h1>22222</h1>', // 初始化内容
       src_path: window.location.origin + '/tinymce7.5.1/js/tinymce/tinymce.min.js',  // tinymce路径
-      tinymceEditor: new tinymceApi('tinymceEditor')  // tinymce实例
+      tinymceEditor: new tinymceApi('tinymceEditor'),  // tinymce实例
+      tocTree: []
     }
   },
    methods: {
     init() {
       let element = document.createElement('div')
       element.innerHTML = this.content
-      console.log(element)
-      new tinymceTree(element)
+      const tree = new tinymceTree(element).treeJSON()
+      this.tocTree = tree
     },
     handleModelUpdate(value){
-      console.log(this.content)
-      console.log(value)
+      const tree = new tinymceTree(value).treeJSON()
+      this.tocTree = tree
     },
     paste() {
       this.content = this.tinymceEditor.tinymce().getContent()
+      const tree = new tinymceTree(this.content).treeJSON()
+      this.tocTree = tree
     },
     newTinymce() {
         // 只对tinymceEditor id的元素进行初始化 
@@ -218,12 +221,16 @@ export default {
                     editor.selectionContentElements = ''
                     editor.selectionContentText = ''
                     editor.selectionGetContent = ''
+                    const tree = new tinymceTree(_this.content).treeJSON()
+                    _this.tocTree = tree
                 });
                 editor.on('EditorContentLoaded', function () {
 
                 });
                 editor.on('ExecCommand', function(e) {
                     _this.content = _this.tinymceEditor.tinymce().getContent()
+                    const tree = new tinymceTree(_this.content).treeJSON()
+                    _this.tocTree = tree
                     if(e.command === 'mceToggleFormat'){
                         console.log('e.value')
                         console.log(e.value)

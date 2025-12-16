@@ -9,6 +9,14 @@ const router = createRouter({
         component: import("@/views/DevTools/index.vue"),
       },
       {
+        path: '/login',
+        name: 'login',
+        component: () => import('@/views/Login/index.vue'),
+        meta: {
+          keepAlive: false,
+        },
+      },
+      {
         path: "/generate",
         name: "generate",
         component: () => import("@/components/tools/tools-index.vue"),

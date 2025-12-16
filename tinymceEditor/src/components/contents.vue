@@ -1,6 +1,6 @@
 <template>
     <div class="three">
-        <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+        <el-tree :data="dataTree.length ? dataTree : data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
     </div>
 </template>
 <script>
@@ -77,6 +77,6 @@ export default {
 
 <style scoped>
 .three {
-    width: 100px;
+    width: 220px;
 }
 </style>
