@@ -10,6 +10,11 @@
         <el-input v-model="scope.row.value" placeholder="Value"></el-input>
       </template>
     </el-table-column>
+    <el-table-column label="Description" prop="description">
+      <template #default="scope">
+        <el-input v-model="scope.row.description" placeholder="Description"></el-input>
+      </template>
+    </el-table-column>
     <el-table-column label="操作" width="80">
       <template #default="scope">
         <el-button type="danger" link @click="removeRow(scope.$index)">删除</el-button>
@@ -26,6 +31,7 @@ import { ElTable, ElTableColumn, ElInput, ElButton } from 'element-plus';
 interface ParamRow {
   key: string;
   value: string;
+  description: string;
 }
 
 const props = defineProps<{
@@ -42,7 +48,7 @@ watch(localParams, (newVal) => {
 }, { deep: true });
 
 const addRow = () => {
-  localParams.value.push({ key: '', value: '' });
+  localParams.value.push({ key: '', value: '', description: '' });
 };
 
 const removeRow = (index: number) => {

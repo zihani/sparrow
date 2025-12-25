@@ -25,11 +25,29 @@ app.use(async (ctx, next) => {
         }
     }
 });
+// 解决跨域问题
+// CORS 中间件：处理跨域与预检请求
+app.use(async (ctx, next) => {
+  const origin = process.env.CORS_ORIGIN || '*';
+  const allowCredentials = process.env.CORS_CREDENTIALS === 'true' ? 'true' : 'false';
+  ctx.set('Access-Control-Allow-Origin', origin);
+  ctx.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+  ctx.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-Requested-With');
+  ctx.set('Access-Control-Expose-Headers', 'Authorization');
+  ctx.set('Access-Control-Allow-Credentials', allowCredentials);
+  if (ctx.method === 'OPTIONS') {
+    ctx.status = 204;
+    return;
+  }
+  await next();
+});
 
 app.use(bodyParser());
 
+// 在业务路由之前挂载 JWT 保护
 app.use(auth);
 
+// Swagger 路由（生产环境仅注册业务路由，文档端点关闭）
 app.use(swaggerRouter.routes()).use(swaggerRouter.allowedMethods());
 const port = 3000;
 app.listen(port, () => {

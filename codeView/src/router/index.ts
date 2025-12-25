@@ -1,17 +1,26 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import NProgress from "nprogress";
+import { start as progressStart, close as progressClose } from '@/utils/nprogress'
+import pinia from '@/stores/index'
+import { useUserStore } from '@/stores/useUserStore'
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
       {
         path: '/',
-        name: 'home',
-        component: import("@/views/DevTools/index.vue"),
+        redirect: '/home'
       },
       {
         path: '/login',
         name: 'login',
         component: () => import('@/views/Login/index.vue'),
+        meta: {
+          keepAlive: false,
+        },
+      },
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/Home/index.vue'),
         meta: {
           keepAlive: false,
         },
@@ -39,18 +48,30 @@ const router = createRouter({
         meta: {
           keepAlive: false, //需要缓存
         }
+      },
+      {
+        path: "/coding",
+        name: "coding",
+        component: () => import("@/components/tools/coding.vue"),
+        meta: {
+          keepAlive: false, //需要缓存
+        }
       }
     ]
 })
 
-NProgress.configure({
-  showSpinner:false
-})
 router.beforeEach((to)=>{
-  NProgress.start();
+  progressStart();
+  const userStore = useUserStore(pinia)
+  if (to.path === '/login' && userStore.token) {
+    return { path: '/home' }
+  }
+  if (to.path !== '/login' && !userStore.token) {
+    return { path: '/login' }
+  }
 })
 router.afterEach((to)=>{
-  NProgress.done()
+  progressClose()
 })
 
 export default router

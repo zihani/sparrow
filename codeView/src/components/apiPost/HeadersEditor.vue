@@ -1,120 +1,248 @@
 <template>
-  <el-table :data="localData" style="width: 100%" size="small" class="key-value-table" :show-header="true">
-    <el-table-column type="selection" width="55" />
-    <el-table-column label="Key" prop="key" width="200">
-      <template #header>
-        <span class="table-header-key">Key</span>
-      </template>
+  <el-table :data="localHeaders" style="width: 100%">
+    <el-table-column label="Key" prop="key">
       <template #default="scope">
-        <el-input v-model="scope.row.key" placeholder="Key" size="small" :disabled="scope.row.disabled" />
+        <el-select
+          v-model="scope.row.key"
+          filterable
+          remote
+          :remote-method="onQueryHeaders"
+          reserve-keyword
+          allow-create
+          default-first-option
+          clearable
+          placeholder="Key"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="item in headerKeyOptions"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
       </template>
     </el-table-column>
     <el-table-column label="Value" prop="value">
-      <template #header>
-        <span class="table-header-key">Value</span>
-      </template>
       <template #default="scope">
-        <el-input v-model="scope.row.value" placeholder="Value" size="small" :disabled="scope.row.disabled" />
+        <el-select
+          v-model="scope.row.value"
+          filterable
+          remote
+          :remote-method="makeValueQuery(scope.$index)"
+          reserve-keyword
+          allow-create
+          default-first-option
+          clearable
+          placeholder="Value"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="opt in (valueOptionsMap[scope.$index] || [])"
+            :key="opt"
+            :label="opt"
+            :value="opt"
+          />
+        </el-select>
       </template>
     </el-table-column>
-    <el-table-column width="60">
+    <el-table-column label="Description" prop="description">
       <template #default="scope">
-        <el-button 
-          type="danger" 
-          :icon="Delete" 
-          circle 
-          plain 
-          size="small"
-          @click="removeRow(scope.$index)"
-          :disabled="localData.length === 1 && scope.$index === 0"
-        />
+        <el-input v-model="scope.row.description" placeholder="Description"></el-input>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" width="80">
+      <template #default="scope">
+        <el-button type="danger" link @click="removeRow(scope.$index)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
-  <div class="table-actions">
-    <el-button type="primary" link @click="addRow">
-      + 添加新行
-    </el-button>
-  </div>
+  <el-button type="primary" link @click="addRow" style="margin-top: 10px;">+ 添加</el-button>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { ElTable, ElTableColumn, ElInput, ElButton, ElMessageBox } from 'element-plus';
-import { Delete } from '@element-plus/icons-vue';
+import { ref, watch } from 'vue';
+import { ElTable, ElTableColumn, ElInput, ElButton, ElSelect, ElOption } from 'element-plus';
 
-interface KeyValueRow {
+interface HeaderRow {
   key: string;
   value: string;
-  disabled?: boolean;
+  description: string;
 }
 
 const props = defineProps<{
-  modelValue: KeyValueRow[];
+  headers: HeaderRow[];
 }>();
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:headers']);
 
-// 内部数据状态
-const localData = ref<KeyValueRow[]>(props.modelValue && props.modelValue.length > 0 
-  ? props.modelValue 
-  : [{ key: '', value: '', disabled: false }]
-);
+const localHeaders = ref<HeaderRow[]>(props.headers);
 
-// 监听 props 变化并同步到内部
-watch(() => props.modelValue, (newVal) => {
-  if (newVal !== localData.value) {
-     localData.value = newVal && newVal.length > 0 
-      ? newVal 
-      : [{ key: '', value: '', disabled: false }];
-  }
-}, { deep: true, immediate: true });
+const headerKeyOptions: string[] = [
+  'Accept',
+  'Accept-Charset',
+  'Accept-Encoding',
+  'Accept-Language',
+  'Access-Control-Request-Headers',
+  'Access-Control-Request-Method',
+  'Authorization',
+  'Cache-Control',
+  'Content-MD5',
+  'Content-Length',
+  'Content-Transfer-Encoding',
+  'Content-Type',
+  'Cookie',
+  'Cookie 2',
+  'Date',
+  'Expect',
+  'From',
+  'Host',
+  'If-Match',
+  'If-Modified-Since',
+  'If-None-Match',
+  'If-Range',
+  'If-Unmodified-Since',
+  'Keep-Alive',
+  'Max-Forwards',
+  'Origin',
+  'Pragma',
+  'Proxy-Authorization',
+  'Range',
+  'Referer',
+  'TE',
+  'Trailer',
+  'Transfer-Encoding',
+  'Upgrade',
+  'User-Agent',
+  'Via',
+  'Warning',
+  'X-Requested-With',
+  'X-Do-Not-Track',
+  'DNT',
+  'x-api-key',
+  'x-mock-match-request-body',
+  'x-mock-match-request-headers',
+  'x-mock-response-id',
+  'x-mock-response-name',
+  'x-mock-response-code',
+  'x-mock-response-delay',
+  'Connection',
+];
 
-// 监听内部变化并同步到父组件 (去除非空行)
-watch(localData, (newVal) => {
-  // 过滤掉 Key 和 Value 都为空的行，但保留至少一行用于编辑
-  const filteredData = newVal.filter(row => row.key || row.value);
-  emit('update:modelValue', filteredData);
+const headerKeyOptionsAll = [...headerKeyOptions];
+
+const mimeTypesAll: string[] = [
+  'application/atom+xml',
+  'application/ecmascript',
+  'application/json',
+  'application/vnd.api+json',
+  'application/javascript',
+  'application/octet-stream',
+  'application/ogg',
+  'application/pdf',
+  'application/postscript',
+  'application/rdf+xml',
+  'application/rss+xml',
+  'application/soap+xml',
+  'application/font-woff',
+  'application/x-yaml',
+  'application/xhtml+xml',
+  'application/xml',
+  'application/xml-dtd',
+  'application/xop+xml',
+  'application/zip',
+  'application/gzip',
+  'application/graphql',
+  'application/x-www-form-urlencoded',
+  'audio/basic',
+  'audio/L24',
+  'audio/mp4',
+  'audio/mpeg',
+  'audio/ogg',
+  'audio/vorbis',
+  'audio/vnd.rn-realaudio',
+  'audio/vnd.wave',
+  'audio/webm',
+  'image/gif',
+  'image/jpeg',
+  'image/pjpeg',
+  'image/png',
+  'image/svg+xml',
+  'image/tiff',
+  'message/http',
+  'message/imdn+xml',
+  'message/partial',
+  'message/rfc822',
+  'multipart/mixed',
+  'multipart/alternative',
+  'multipart/related',
+  'multipart/form-data',
+  'multipart/signed',
+  'multipart/encrypted',
+  'text/cmd',
+  'text/css',
+  'text/csv',
+  'text/html',
+  'text/plain',
+  'text/vcard',
+  'text/xml',
+];
+
+const valueOptionsMap = ref<Record<number, string[]>>({});
+
+const baseOptionsForKey = (key: string): string[] => {
+  const k = (key || '').toLowerCase();
+  return k === 'content-type' || k === 'accept' ? mimeTypesAll : [];
+};
+
+watch(localHeaders, (newVal) => {
+  emit('update:headers', newVal);
 }, { deep: true });
 
+watch(localHeaders, (rows) => {
+  rows.forEach((row, index) => {
+    valueOptionsMap.value[index] = baseOptionsForKey(row.key);
+  });
+}, { deep: true, immediate: true });
+
 const addRow = () => {
-  // 确保最后一行至少有一个空行可以编辑
-  if (localData.value.length === 0 || localData.value[localData.value.length - 1].key !== '' || localData.value[localData.value.length - 1].value !== '') {
-    localData.value.push({ key: '', value: '', disabled: false });
-  }
+  localHeaders.value.push({ key: '', value: '', description: '' });
+  const idx = localHeaders.value.length - 1;
+  valueOptionsMap.value[idx] = baseOptionsForKey(localHeaders.value[idx].key);
 };
 
 const removeRow = (index: number) => {
-  if (localData.value.length > 1) {
-    localData.value.splice(index, 1);
-  } else if (localData.value.length === 1) {
-    // 如果是最后一行，则清空内容而不是删除
-    localData.value[0].key = '';
-    localData.value[0].value = '';
-  }
+  localHeaders.value.splice(index, 1);
+  delete valueOptionsMap.value[index];
 };
 
-// 初始加载时确保至少有一个空行
-if (localData.value.length === 0) {
-  addRow();
-}
-</script>
+const isFuzzyMatch = (query: string, target: string) => {
+  const q = query.toLowerCase().trim();
+  const t = target.toLowerCase();
+  if (!q) return true;
+  if (t.includes(q)) return true;
+  let ti = 0;
+  for (let qi = 0; qi < q.length; qi++) {
+    const ch = q[qi];
+    ti = t.indexOf(ch, ti);
+    if (ti === -1) return false;
+    ti++;
+  }
+  return true;
+};
 
-<style scoped>
-.key-value-table {
-  /* 移除 Element Plus 默认的底部边框，让表格更紧凑 */
-  border-bottom: none;
-}
-:deep(.el-table__row) {
-  height: 38px; /* 调整行高 */
-}
-:deep(.el-table__header) {
-  background-color: #f7f7f7; /* 表头背景色 */
-}
-.table-header-key {
-  font-weight: bold;
-}
-.table-actions {
-  padding: 8px 0;
-}
-</style>
+const onQueryHeaders = (query: string) => {
+  const q = query ?? '';
+  (headerKeyOptions as string[]).splice(0, headerKeyOptions.length, ...headerKeyOptionsAll.filter((opt) => isFuzzyMatch(q, opt)));
+};
+
+const onQueryValue = (query: string, index: number) => {
+  const base = baseOptionsForKey(localHeaders.value[index]?.key || '');
+  const q = query ?? '';
+  valueOptionsMap.value[index] = base.filter((opt) => isFuzzyMatch(q, opt));
+};
+
+const makeValueQuery = (index: number) => {
+  return (q: string) => onQueryValue(q, index);
+};
+</script>
